@@ -28,7 +28,11 @@ def run():
 
     allay.commands.parse_commands_from_cli()
 
-    allay.settings.import_settings(allay.commands.cli_settings)
+    # filter cli arguments that contain their default value and a value has already been set in settings
+    filtered_cli_arguments = dict([
+        (key, value) for key, value in allay.commands.cli_settings.__dict__.items()
+        if allay.commands.registry[key]['default_value'] is not value or key not in allay.settings.settings])
+    allay.settings.merge_settings(filtered_cli_arguments)
 
     allay.commands.validate()
     allay.commands.run()

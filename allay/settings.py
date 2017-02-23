@@ -8,13 +8,15 @@ import allay.yaml_util
 settings = {}
 
 
-def _merge_settings(dict1, dict2):
-    for k, v in dict2.iteritems():
-        if (k in dict1 and isinstance(dict1[k], dict)
-                and isinstance(dict2[k], collections.Mapping)):
-            _merge_settings(dict1[k], dict2[k])
+def merge_settings(new_settings):
+    global settings
+
+    for k, v in new_settings.iteritems():
+        if (k in settings and isinstance(settings[k], dict)
+                and isinstance(new_settings[k], collections.Mapping)):
+            merge_settings(settings[k], new_settings[k])
         else:
-            dict1[k] = dict2[k]
+            settings[k] = new_settings[k]
 
 
 def explain():
@@ -25,17 +27,13 @@ def explain():
     print '-' * 50, "\n"
 
 
-def import_settings(obj):
-    _merge_settings(settings, obj.__dict__)
-
-
 def load_config():
     global settings
 
     settings_config_path = os.path.join(allay.paths.paths['allay_config_root'], 'settings.yaml')
-    _merge_settings(settings, allay.yaml_util.load(settings_config_path) or {})
+    merge_settings(allay.yaml_util.load(settings_config_path) or {})
 
     user_settings_config_path = os.path.join(allay.paths.paths['project_root'], '.allayrc')
 
     if os.path.exists(user_settings_config_path):
-        _merge_settings(settings, allay.yaml_util.load(user_settings_config_path) or {})
+        merge_settings(allay.yaml_util.load(user_settings_config_path) or {})

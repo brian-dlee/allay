@@ -38,6 +38,7 @@ def register(*args, **kwargs):
 
     arg = command_parser.add_argument(*args, **command_parser_args)
     registry[arg.dest] = allay_args
+    registry[arg.dest]['default_value'] = arg.default
 
 
 def run():
