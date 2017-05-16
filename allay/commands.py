@@ -36,6 +36,12 @@ def register(*args, **kwargs):
         else:
             command_parser_args[key] = value
 
+    if 'dest' in command_parser_args:
+        if 'help' in command_parser_args:
+            command_parser_args['help'] += ' [Config file key: ' + command_parser_args['dest'] + ']'
+        else:
+            command_parser_args['help'] = ' [Config file key: ' + command_parser_args['dest'] + ']'
+
     arg = command_parser.add_argument(*args, **command_parser_args)
     registry[arg.dest] = allay_args
     registry[arg.dest]['default_value'] = arg.default
