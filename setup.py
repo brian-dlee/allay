@@ -9,7 +9,15 @@ setup(
     author_email='briandl92391@gmail.com',
     license='MIT',
     packages=['allay'],
-    install_requires=['PyYaml'],
+    install_requires=[
+        'PyYaml',
+        'tractor',
+        'crypt'
+    ],
+    dependency_links=[
+        'git+https://github.com/orionnetworksolutions/Tractor.git#egg=tractor',
+        'git+https://github.com/orionnetworksolutions/Crypt.git#egg=crypt'
+    ],
     scripts=['scripts/allay'],
     zip_safe=True,
     test_suite='allay.test',
