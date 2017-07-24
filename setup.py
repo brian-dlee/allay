@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='allay',
-    version='0.1.0',
+    version='0.1.1',
     description='Alleviate environmental pains',
     url='https://github.com/orionnetworksolutions/Allay.git',
     author='Brian Lee',
@@ -11,7 +11,7 @@ setup(
     packages=['allay'],
     install_requires=[
         'PyYaml',
-        'tractor',
+        'tractor>0.1.0',
         'crypt>=0.1.0'
     ],
     dependency_links=[
