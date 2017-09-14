@@ -1,4 +1,11 @@
+import sys
 import yaml
+
+
+def explain(header, obj):
+    print "\n{0:-^50}".format(' ' + header + ' ')
+    sys.stdout.write(pretty_print(obj))
+    print '-' * 50, "\n"
 
 
 def load(file_path):

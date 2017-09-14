@@ -1,45 +1,42 @@
-
-import os
-import sys
-
-import allay.commands
-import allay.env
-import allay.extension_manager
-import allay.logger
-import allay.paths
-import allay.settings
+from dict_utils import deep_merge
+from yaml_util import explain
+from environment import env
+from config import settings
+import commands
+import environment
+import extension_manager
+import logger
+import paths
+import config
 
 
 def run():
-    if len(sys.argv) > 1 and not sys.argv[1].startswith('-'):
-        if not os.path.exists(sys.argv[1]):
-            allay.logger.error('Project root specified ({0}) does not exist'.format(sys.argv[1]), exit_code=1)
-        allay.paths.paths['project_root'] = os.path.abspath(sys.argv[1])
-        sys.argv = sys.argv[0:1] + sys.argv[2:]
+    cli_args = commands.parse_allay_args()
+    deep_merge(settings, paths.load(cli_args.allay_paths_project_root))
 
-    allay.commands.initialize()
-    allay.paths.initialize()
+    environment.load_files()
+    config.load_files()
 
-    allay.env.load_config()
-    allay.settings.load_config()
+    if extension_manager.check_for_extension():
+        extension_manager.load_extension()
+        commands.parse_extension_args()
 
-    if allay.extension_manager.check_for_extension():
-        allay.extension_manager.load_extension()
+    # Since extensions can register arguments we need to reprocess cli args
+    deep_merge(settings, commands.get_cli_settings())
 
-    allay.commands.parse_commands_from_cli()
+    if 'volumes' in settings:
+        environment.configure_volumes()
 
-    # filter cli arguments that contain their default value and a value has already been set in settings
-    filtered_cli_arguments = dict([
-        (key, value) for key, value in allay.commands.cli_settings.__dict__.items()
-        if allay.commands.registry[key]['default_value'] is not value or key not in allay.settings.settings])
-    allay.settings.merge_settings(filtered_cli_arguments)
+    if settings.get('allay_list_volumes', False):
+        explain('Volume Configuration', settings['volumes'])
+        exit()
 
-    allay.commands.validate()
-    allay.commands.run()
+    commands.validate()
+    commands.run()
 
-    allay.settings.explain()
+    explain('Active Configuration', settings)
 
-    allay.env.write_docker_compose()
+    environment.write_docker_compose()
 
-    print "Successully updated docker-compose.yaml"
+    print "Successully updated docker-compose.yml"
     print "The environment is ready. Run docker-compose up to use it."

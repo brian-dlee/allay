@@ -1,9 +1,9 @@
 import os
 import sys
 
-import allay.paths
-
-_extension = None
+from config import get_config_root
+import logger
+import config
 
 
 def extension_is_loaded():
@@ -12,17 +12,18 @@ def extension_is_loaded():
 
 def check_for_extension():
     found = False
+    config_root = get_config_root()
 
-    if os.path.exists(os.path.join(allay.paths.paths['allay_config_root'], 'extension.py')):
-        allay.paths.paths['extension_path'] = os.path.join(allay.paths.paths['allay_config_root'], 'extension.py')
+    if os.path.exists(os.path.join(config_root, 'extension.py')):
+        config.settings['allay_paths_extension'] = os.path.join(config_root, 'extension.py')
         found = True
 
-    if os.path.exists(os.path.join(allay.paths.paths['allay_config_root'], 'extension', '__init__.py')):
-        allay.paths.paths['extension_path'] = os.path.join(allay.paths.paths['allay_config_root'], 'extension', '__init__.py')
+    if os.path.exists(os.path.join(config_root, 'extension', '__init__.py')):
+        config.settings['allay_paths_extension'] = os.path.join(config_root, 'extension', '__init__.py')
         found = True
 
     if found:
-        allay.logger.log('Found extension at {0}'.format(allay.paths.paths['extension_path']))
+        logger.log('Found extension at {0}'.format(config.settings['allay_paths_extension']))
 
     return found
 
@@ -30,7 +31,7 @@ def check_for_extension():
 def load_extension():
     global _extension
 
-    sys.path.append(allay.paths.paths['allay_config_root'])
+    sys.path.append(get_config_root())
 
     import extension
     _extension = extension
@@ -38,3 +39,5 @@ def load_extension():
 
 def run_extension():
     return _extension.main()
+
+_extension = None
