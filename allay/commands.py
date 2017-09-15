@@ -45,25 +45,38 @@ def get_cli_settings():
     cli_settings = {}
 
     for k, v in cli_args.__dict__.items():
-        if registry[k]['default_value'] is v and k in settings:
+        if (registry[k]['default_value'] is v or v is None) and k in settings:
             continue
 
-        if k.startswith('allay_volume_') and v:
-            if 'volumes' not in cli_settings:
-                cli_settings['volumes'] = {}
+        key_parts = k.split('_')
 
-            vol_setting_type = k.split('_')[-1]
-            vol_setting = v.split(':')
+        if key_parts[0] == 'allay' and key_parts[1] in ('remote', 'volume'):
+            setting_key = key_parts[1] + 's'
 
-            if len(vol_setting) < 2:
-                logger.error("Malformed volume option for type "
-                             "\"{}\" (value={}).\n".format(vol_setting_type, v) +
-                             "Volume options should be in the form of \"VOLUME_NAME:VALUE\"")
+            if setting_key not in cli_settings:
+                cli_settings[setting_key] = {}
 
-            if vol_setting[0] not in cli_settings['volumes']:
-                cli_settings['volumes'][vol_setting[0]] = {}
+            setting_type = k.split('_')[-1]
 
-            cli_settings['volumes'][vol_setting[0]][vol_setting_type] = vol_setting[1]
+            if isinstance(v, str):
+                setting_value = v.split(':')
+
+                if len(setting_value) < 2:
+                    logger.error("Malformed allay option for type "
+                                 "\"{}\" (value={}).\n".format(k, v) +
+                                 "Volume options should be in the form of \"NAME:VALUE\"")
+
+                if setting_value[0] not in cli_settings[setting_key]:
+                    cli_settings[setting_key][setting_value[0]] = {}
+
+                normalized_value = setting_value[1]
+
+                if setting_value[1].lower() in ('no', 'false', 'off'):
+                    normalized_value = False
+                elif setting_value[1].lower() in ('yes', 'true', 'on'):
+                    normalized_value = True
+
+                cli_settings[setting_key][setting_value[0]][setting_type] = normalized_value
         else:
             cli_settings[k] = v
 
@@ -123,6 +136,12 @@ def validate():
 command_parser = argparse.ArgumentParser()
 registry = {}
 
+register('-Ri', '--allay-remote-ip', dest='allay_remote_ip',
+         help='Configure a remote alternative for a service. Format = remote:(ip or hostname)')
+register('-Ra', '--allay-remote-activate', dest='allay_remote_active',
+         help='Turn on or off a given remote. Format = remote:(yes or no)')
+register('-Rs', '--allay-remote-service', dest='allay_remote_service',
+         help='Indicates which service this remote replaces. Format = remote:service')
 register('-Pr', '--allay-paths-project-root', dest='allay_paths_project_root',
          help='Configure the path in which to search for the Allay-enabled project.')
 register('-Pc', '--allay-paths-config-root', dest='allay_paths_config_root',
@@ -136,6 +155,4 @@ register('-Vo', '--allay-volume-opts', dest='allay_volume_opts',
 register('-Vs', '--allay-volume-source', dest='allay_volume_source',
          help='Adjust volume source. Format = volume:source.')
 register('-Vt', '--allay-volume-target', dest='allay_volume_target',
-         help='Adjust volume target. Format = volume:target.')
-register('-Vd', '--allay-host-volumes-dir', dest='allay_host_volumes_dir',
          help='Adjust volume target. Format = volume:target.')

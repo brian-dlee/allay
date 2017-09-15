@@ -24,8 +24,8 @@ def run():
     # Since extensions can register arguments we need to reprocess cli args
     deep_merge(settings, commands.get_cli_settings())
 
-    if 'volumes' in settings:
-        environment.configure_volumes()
+    environment.configure_volumes()
+    environment.configure_networking()
 
     if settings.get('allay_list_volumes', False):
         explain('Volume Configuration', settings['volumes'])

@@ -34,6 +34,14 @@ def load_files():
             allay.yaml_util.load(volumes_config_path)
         )
 
+    remotes_config_path = os.path.join(settings['allay_paths_config_root'], 'remotes.yml')
+
+    if os.path.exists(remotes_config_path):
+        settings['remotes'] = {}
+        settings['remotes'].update(
+            allay.yaml_util.load(remotes_config_path)
+        )
+
     user_settings_config_path = os.path.join(settings['allay_paths_project_root'], '.allayrc')
 
     if os.path.exists(user_settings_config_path):
