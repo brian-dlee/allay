@@ -50,33 +50,34 @@ def get_cli_settings():
 
         key_parts = k.split('_')
 
-        if key_parts[0] == 'allay' and key_parts[1] in ('remote', 'volume'):
-            setting_key = key_parts[1] + 's'
+        if key_parts[0] == 'allay' and key_parts[1] in ('remote', 'volume', 'service') and v:
+            for individual_value in v:
+                setting_key = key_parts[1] + 's'
 
-            if setting_key not in cli_settings:
-                cli_settings[setting_key] = {}
+                if setting_key not in cli_settings:
+                    cli_settings[setting_key] = {}
 
-            setting_type = k.split('_')[-1]
+                setting_type = k.split('_')[-1]
 
-            if isinstance(v, str):
-                setting_value = v.split(':')
+                if isinstance(individual_value, str):
+                    setting_value = individual_value.split(':')
 
-                if len(setting_value) < 2:
-                    logger.error("Malformed allay option for type "
-                                 "\"{}\" (value={}).\n".format(k, v) +
-                                 "Volume options should be in the form of \"NAME:VALUE\"")
+                    if len(setting_value) < 2:
+                        logger.error("Malformed allay option for type "
+                                     "\"{}\" (value={}).\n".format(k, individual_value) +
+                                     "Volume options should be in the form of \"NAME:VALUE\"")
 
-                if setting_value[0] not in cli_settings[setting_key]:
-                    cli_settings[setting_key][setting_value[0]] = {}
+                    if setting_value[0] not in cli_settings[setting_key]:
+                        cli_settings[setting_key][setting_value[0]] = {}
 
-                normalized_value = setting_value[1]
+                    normalized_value = setting_value[1]
 
-                if setting_value[1].lower() in ('no', 'false', 'off'):
-                    normalized_value = False
-                elif setting_value[1].lower() in ('yes', 'true', 'on'):
-                    normalized_value = True
+                    if setting_value[1].lower() in ('no', 'false', 'off'):
+                        normalized_value = False
+                    elif setting_value[1].lower() in ('yes', 'true', 'on'):
+                        normalized_value = True
 
-                cli_settings[setting_key][setting_value[0]][setting_type] = normalized_value
+                    cli_settings[setting_key][setting_value[0]][setting_type] = normalized_value
         else:
             cli_settings[k] = v
 
@@ -136,12 +137,14 @@ def validate():
 command_parser = argparse.ArgumentParser()
 registry = {}
 
-register('-Ri', '--allay-remote-ip', dest='allay_remote_ip',
+register('-Ri', '--allay-remote-ip', nargs='*', dest='allay_remote_ip',
          help='Configure a remote alternative for a service. Format = remote:(ip or hostname)')
-register('-Ra', '--allay-remote-activate', dest='allay_remote_active',
+register('-Ra', '--allay-remote-active', nargs='*', dest='allay_remote_active',
          help='Turn on or off a given remote. Format = remote:(yes or no)')
-register('-Rs', '--allay-remote-service', dest='allay_remote_service',
+register('-Rs', '--allay-remote-service', nargs='*', dest='allay_remote_service',
          help='Indicates which service this remote replaces. Format = remote:service')
+register('-Sa', '--allay-service-active', nargs='*', dest='allay_service_active',
+         help='Turn on or off a given service. Format = service:(yes or no)')
 register('-Pr', '--allay-paths-project-root', dest='allay_paths_project_root',
          help='Configure the path in which to search for the Allay-enabled project.')
 register('-Pc', '--allay-paths-config-root', dest='allay_paths_config_root',
@@ -150,9 +153,11 @@ register('-Pv', '--allay-paths-volumes-dir', dest='allay_paths_volumes_dir',
          help='Configure the path in where volumes are stored.')
 register('-Lv', '--allay-list-volumes', dest='allay_list_volumes', action='store_true',
          help='List volume configuration.')
-register('-Vo', '--allay-volume-opts', dest='allay_volume_opts',
+register('-Lc', '--allay-list-configuration', dest='allay_list_configuration', action='store_true',
+         help='List full option configuration.')
+register('-Vo', '--allay-volume-opts', nargs='*', dest='allay_volume_opts',
          help='Adjust volume opts. Format = volume:opts.')
-register('-Vs', '--allay-volume-source', dest='allay_volume_source',
+register('-Vs', '--allay-volume-source', nargs='*', dest='allay_volume_source',
          help='Adjust volume source. Format = volume:source.')
-register('-Vt', '--allay-volume-target', dest='allay_volume_target',
+register('-Vt', '--allay-volume-target', nargs='*', dest='allay_volume_target',
          help='Adjust volume target. Format = volume:target.')

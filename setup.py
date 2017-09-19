@@ -12,7 +12,8 @@ setup(
     install_requires=[
         'PyYaml',
         'tractor>0.1.0',
-        'crypt>=0.1.0'
+        'crypt>=0.1.0',
+        'termcolor'
     ],
     dependency_links=[
         'git+https://github.com/orionnetworksolutions/Tractor.git#egg=tractor',

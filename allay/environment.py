@@ -1,9 +1,19 @@
+import glob
 import os
 
 from config import settings, get_volumes_dir, get_project_root, get_config_root
-import paths
 import yaml_util
 import logger
+
+
+def configure_services():
+    if 'services' not in settings:
+        settings['services'] = {}
+
+    for service, service_definition in env['services'].items():
+        if service in settings['services']:
+            if not settings['services'][service].get('active', True):
+                del env['services'][service]
 
 
 def configure_volumes():
@@ -133,6 +143,9 @@ def load_files():
 
 
 def write_docker_compose():
+    for f in glob.glob(os.path.join(get_project_root(), 'docker-compose.y*')):
+        os.remove(f)
+
     docker_compose_path = os.path.join(get_project_root(), 'docker-compose.yml')
     yaml_util.write(env, docker_compose_path)
 

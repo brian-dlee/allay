@@ -24,6 +24,7 @@ def run():
     # Since extensions can register arguments we need to reprocess cli args
     deep_merge(settings, commands.get_cli_settings())
 
+    environment.configure_services()
     environment.configure_volumes()
     environment.configure_networking()
 
@@ -31,12 +32,14 @@ def run():
         explain('Volume Configuration', settings['volumes'])
         exit()
 
+    if settings.get('allay_list_configuration', False):
+        explain('Configuration', settings)
+        exit()
+
     commands.validate()
     commands.run()
 
-    explain('Active Configuration', settings)
-
     environment.write_docker_compose()
 
-    print "Successully updated docker-compose.yml"
-    print "The environment is ready. Run docker-compose up to use it."
+    logger.log("Successully updated docker-compose.yml")
+    logger.log("The environment is ready. Run docker-compose up to use it.")

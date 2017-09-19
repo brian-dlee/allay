@@ -1,5 +1,7 @@
 from sys import stderr, stdout
 
+from termcolor import colored
+
 
 def output(fd, *text_args):
     text = ""
@@ -19,13 +21,17 @@ def error(*message, **kwargs):
     if 'exit_code' in kwargs:
         exit_code = int(kwargs['exit_code'])
 
-    warn(*message)
+    text = colored(' '.join(map(str, message)), 'red')
+
+    output(stderr, text)
     exit(exit_code)
 
 
 def log(*message):
-    output(stdout, *message)
+    text = colored(' '.join(map(str, message)), 'green')
+    output(stdout, text)
 
 
 def warn(*message):
-    output(stderr, *message)
+    text = colored(' '.join(map(str, message)), 'yellow')
+    output(stderr, text)
