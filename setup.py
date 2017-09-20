@@ -4,20 +4,14 @@ setup(
     name='allay',
     version='0.2.0',
     description='Alleviate environmental pains',
-    url='https://github.com/orionnetworksolutions/Allay.git',
+    url='https://github.com/brian-dlee/Allay.git',
     author='Brian Lee',
     author_email='briandl92391@gmail.com',
     license='MIT',
     packages=['allay'],
     install_requires=[
         'PyYaml',
-        'tractor>0.1.0',
-        'crypt>=0.1.0',
         'termcolor'
-    ],
-    dependency_links=[
-        'git+https://github.com/orionnetworksolutions/Tractor.git#egg=tractor',
-        'git+https://github.com/orionnetworksolutions/Crypt.git#egg=crypt'
     ],
     scripts=['scripts/allay'],
     zip_safe=True,

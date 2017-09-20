@@ -137,6 +137,8 @@ def validate():
 command_parser = argparse.ArgumentParser()
 registry = {}
 
+register('-Cs', '--allay-config-save', dest='allay_config_save',
+         help='Configure a remote alternative for a service. Format = remote:(ip or hostname)')
 register('-Ri', '--allay-remote-ip', nargs='*', dest='allay_remote_ip',
          help='Configure a remote alternative for a service. Format = remote:(ip or hostname)')
 register('-Ra', '--allay-remote-active', nargs='*', dest='allay_remote_active',
