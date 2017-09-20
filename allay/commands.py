@@ -137,8 +137,6 @@ def validate():
 command_parser = argparse.ArgumentParser()
 registry = {}
 
-register('-Cs', '--allay-config-save', dest='allay_config_save',
-         help='Configure a remote alternative for a service. Format = remote:(ip or hostname)')
 register('-Ri', '--allay-remote-ip', nargs='*', dest='allay_remote_ip',
          help='Configure a remote alternative for a service. Format = remote:(ip or hostname)')
 register('-Ra', '--allay-remote-active', nargs='*', dest='allay_remote_active',
@@ -153,6 +151,8 @@ register('-Pc', '--allay-paths-config-root', dest='allay_paths_config_root',
          help='Configure the path in which to search for the Allay config files.')
 register('-Pv', '--allay-paths-volumes-dir', dest='allay_paths_volumes_dir',
          help='Configure the path in where volumes are stored.')
+register('-Le', '--allay-list-extension-requirements', dest='allay_list_extension_requirements', action='store_true',
+         help='List the extensions required packages.')
 register('-Lv', '--allay-list-volumes', dest='allay_list_volumes', action='store_true',
          help='List volume configuration.')
 register('-Lc', '--allay-list-configuration', dest='allay_list_configuration', action='store_true',
