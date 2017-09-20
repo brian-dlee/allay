@@ -7,5 +7,5 @@
 - Docker Toolbox or Docker for Windows/Mac - https://docs.docker.com/engine/installation/
 
 ```bash
-pip install git+https://github.com/orionnetworksolutions/Allay.git#egg=allay
+pip install git+https://github.com/brian-dlee/allay.git#egg=allay
 ```
