@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='allay',
-    version='0.2.0',
+    version='0.2.1',
     description='Alleviate environmental pains',
     url='https://github.com/brian-dlee/Allay.git',
     author='Brian Lee',
@@ -11,7 +11,8 @@ setup(
     packages=['allay'],
     install_requires=[
         'PyYaml',
-        'termcolor'
+        'termcolor',
+        'pip'
     ],
     scripts=['scripts/allay'],
     zip_safe=True,

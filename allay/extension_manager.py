@@ -1,4 +1,6 @@
 import os
+import pip
+import re
 import sys
 
 from config import get_config_root
@@ -28,6 +30,51 @@ def check_for_extension():
     return found
 
 
+def check_requirements():
+    packages = {}
+    missing = []
+
+    for package in pip.get_installed_distributions():
+        packages[package.project_name] = package.version
+
+    for (name, version, source) in _requirements:
+        if name not in packages:
+            missing.append((name, version, source))
+            continue
+
+        if not version or not packages[name]:
+            continue
+
+        op_search = re.search('^([<>=]+)(.+)', version)
+        comparison = '__eq__'
+
+        if op_search:
+            op = op_search.group(1)
+            version = op_search.group(2)
+
+            if op == '>':
+                comparison = '__gt__'
+            elif op == '>=':
+                comparison = '__ge__'
+            elif op == '<=':
+                comparison = '__le__'
+            elif op == '<':
+                comparison = '__lt__'
+
+        if not getattr(packages[name], comparison)(version):
+            missing.append((name, version, source))
+
+    if len(missing) == 0:
+        return True
+
+    logger.error(
+        'The following packages are not installed.\nInstall the extension requirements and rerun allay.\n' +
+        '\n'.join([
+            n + (v if v else '') + (': pip install ' + s if s else '') for (n, v, s) in missing
+        ]) + '\n'
+    )
+
+
 def load_extension():
     global _extension
 
@@ -37,7 +84,26 @@ def load_extension():
     _extension = extension
 
 
+def require(name, version=None, source=None):
+    name_version = name
+
+    if version:
+        name_version += version
+
+    if source:
+        source += '#egg=' + name
+
+    _requirements.append((name, version, source))
+
+
 def run_extension():
-    return _extension.main()
+    if config.settings.get('allay_list_extension_requirements', False):
+        logger.log('Extension requires:\n  ' + '\n  '.join(
+            [n + (v if v else '') + (' ({0})'.format(s) if s else '') for (n, v, s) in _requirements]))
+        logger.log('pip install', *[s if s else (n + (v if v else '')) for (n, v, s) in _requirements])
+        exit()
+
+    return check_requirements() and _extension.main()
 
 _extension = None
+_requirements = []
