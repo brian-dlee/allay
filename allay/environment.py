@@ -51,15 +51,16 @@ def configure_networking():
     extra_hosts = []
     aliases = {}
 
-    for name, c in config.g('remotes').items():
-        service = c.get('service.' + name)
-        ip = c.get('ip', None)
+    for name in config.g('remotes'):
+        key = 'remotes.' + name
+        service = config.g(key + '.service')
+        ip = config.g(key + '.ip', None)
         active = True
 
         if service not in all_remotes_active:
             all_remotes_active[service] = True
 
-        if service in env['services'] and not c.get('active', False):
+        if service in env['services'] and not config.g(key + '.active', False):
             active = False
 
         all_remotes_active[service] = all_remotes_active[service] and active
