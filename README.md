@@ -33,3 +33,7 @@ database_synchronize_settings:
   * Setup key access for your user to access the new user account. Currently, this only supports the use of the default key at `~/.ssh/id_rsa.pub`
 
 All set! The next time allay runs it will try to connect to your host using the configured user account, run a comparison between the files currently found in the schemas-volume director and the corresponding files on the server and download them over SSH.
+
+Next, you should ensure your database container is equipped to ingest these schema files on initialization.
+
+**WARNING: When allay downloads new schemas is deletes the contents of the database data directory to force the ingestion of the newly downloaded files.**
