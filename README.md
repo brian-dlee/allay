@@ -13,9 +13,9 @@ pip install git+https://github.com/brian-dlee/allay.git#egg=allay
 # Configuring database synchronization
 
 1. Ensure you have a volume configured to store database files and database schema files in `volumes.yml`.
-2. In `settings.yml`, add a section for `database_synchronize_settings`. All of the settings specified below are required.
+2. In `settings.yml`, add a section for `dbsync`. All of the settings specified below are required.
 ```yml
-database_synchronize_settings:
+dbsync:
   user: allay
   host: mydbhost.com
   schemas: schema1,schema2

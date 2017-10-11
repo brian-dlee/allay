@@ -21,8 +21,8 @@ def check_database_update_connectivity():
         logger.error(
             '\nCannot connect to remote database to update schemas.\n',
             'Attempted to connect over SSH to {0} as user {1}.\n'.format(
-                settings['database_synchronize_settings']['host'],
-                settings['database_synchronize_settings']['user']) +
+                config.g('dbsync.host'),
+                config.g('dbsync.user')) +
             '\nERROR: {0}'.format(e))
 
     return True
@@ -66,8 +66,8 @@ def initialize_sftp_downloader():
     global sftp_downloader
 
     private_key_file = os.path.expanduser(os.path.join('~', '.ssh', 'id_rsa'))
-    host = settings['database_synchronize_settings']['host']
-    user = settings['database_synchronize_settings']['user']
+    host = config.g('dbsync.host')
+    user = config.g('dbsync.user')
     conn_string = user + '@' + host
 
     try:
@@ -102,17 +102,17 @@ def initialize_sftp_downloader():
 
 def has_all_settings_defined():
     return (
-        'database_synchronize_settings' in settings and
-        'host' in settings['database_synchronize_settings'] and
-        'user' in settings['database_synchronize_settings'] and
-        'schemas' in settings['database_synchronize_settings'] and
-        'schema-volume' in settings['database_synchronize_settings'] and
-        'database-volume' in settings['database_synchronize_settings']
+        'dbsync' in settings and
+        'host' in config.g('dbsync') and
+        'user' in config.g('dbsync') and
+        'schemas' in config.g('dbsync') and
+        'schema-volume' in config.g('dbsync') and
+        'database-volume' in config.g('dbsync')
     )
 
 
 def get_schema_list():
-    schema_string = settings['database_synchronize_settings']['schemas']
+    schema_string = config.g('dbsync.schemas')
 
     return [
         s.strip() for s in schema_string.split(',')
@@ -128,14 +128,14 @@ def check_and_get_volume_settings():
             "defined in the volume settings."
         )
 
-    sync_settings = settings['database_synchronize_settings']
+    sync_settings = config.g('dbsync')
     result = {}
 
     for s in ('schema-volume', 'database-volume'):
         parts = sync_settings[s].split(':')
         volume = parts[0]
 
-        if volume not in settings['volumes']:
+        if volume not in config.g('volumes'):
             logger.error(volume_error_string(s, sync_settings[s]))
 
         path = get_volume_source(volume)
@@ -164,10 +164,7 @@ def sync():
     data_dir = volume_settings['database']['source_path']
     schema_dir = volume_settings['schema']['source_path']
 
-    max_age_in_days = int(settings['database_synchronize_settings'].get(
-        'schema_file_max_age',
-        1
-    ))
+    max_age_in_days = int(config.g('dbsync.schema_file_max_age', 1))
 
     max_age_in_seconds = max_age_in_days * 24 * 60 * 60
 
@@ -206,11 +203,7 @@ def update_schema_files(schema_dir, schema_file_to_update):
 
     logger.log("Downloading missing/outdated schemas from remote system.")
 
-    remote_schema_dir = settings['database_synchronize_settings'].get(
-        'remote_schema_dir',
-        'database-schemas'
-    )
-
+    remote_schema_dir = config.g('dbsync.remote_schema_dir', 'database-schemas')
     schemas_updated = 0
 
     for number, schema_file_path in enumerate(schema_file_to_update):

@@ -17,15 +17,15 @@ def check_for_extension():
     config_root = get_config_root()
 
     if os.path.exists(os.path.join(config_root, 'extension.py')):
-        config.settings['allay_paths_extension'] = os.path.join(config_root, 'extension.py')
+        config.s('allay_paths_extension', os.path.join(config_root, 'extension.py'))
         found = True
 
     if os.path.exists(os.path.join(config_root, 'extension', '__init__.py')):
-        config.settings['allay_paths_extension'] = os.path.join(config_root, 'extension', '__init__.py')
+        config.s('allay_paths_extension', os.path.join(config_root, 'extension', '__init__.py'))
         found = True
 
     if found:
-        logger.log('Found extension at {0}'.format(config.settings['allay_paths_extension']))
+        logger.log('Found extension at {0}'.format(config.g('allay_paths_extension')))
 
     return found
 

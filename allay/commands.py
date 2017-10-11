@@ -37,6 +37,24 @@ def parse_extension_args():
     return command_parser.parse_args(split_args()[1])
 
 
+def normalize_config_value(value):
+    if is_falsy_config_value(value):
+        return False
+
+    if is_truthy_config_value(value):
+        return True
+
+    return value
+
+
+def is_falsy_config_value(value):
+    return value in ('no', 'false', 'off')
+
+
+def is_truthy_config_value(value):
+    return value in ('yes', 'true', 'on')
+
+
 def get_cli_settings():
     global registry
 
@@ -70,16 +88,16 @@ def get_cli_settings():
                     if setting_value[0] not in cli_settings[setting_key]:
                         cli_settings[setting_key][setting_value[0]] = {}
 
-                    normalized_value = setting_value[1]
+                    cli_settings[setting_key][setting_value[0]][setting_type] = \
+                        normalize_config_value(setting_value[1])
+        if key_parts[0] == 'allay' and key_parts[1] in ('feature') and v:
+            if key_parts[1] not in cli_settings:
+                cli_settings[key_parts[1]] = {}
 
-                    if setting_value[1].lower() in ('no', 'false', 'off'):
-                        normalized_value = False
-                    elif setting_value[1].lower() in ('yes', 'true', 'on'):
-                        normalized_value = True
-
-                    cli_settings[setting_key][setting_value[0]][setting_type] = normalized_value
+            cli_settings[key_parts[1]][key_parts[2]] = \
+                normalize_config_value(v)
         else:
-            cli_settings[k] = v
+            cli_settings[k] = normalize_config_value(v)
 
     return cli_settings
 
@@ -137,6 +155,8 @@ def validate():
 command_parser = argparse.ArgumentParser()
 registry = {}
 
+register('-Fd', '--allay-feature-dbsync', dest='allay_feature_dbsync',
+         help='Enables/disables database synchronization. yes or no')
 register('-Ri', '--allay-remote-ip', nargs='*', dest='allay_remote_ip',
          help='Configure a remote alternative for a service. Format = remote:(ip or hostname)')
 register('-Ra', '--allay-remote-active', nargs='*', dest='allay_remote_active',

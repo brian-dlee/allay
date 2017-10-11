@@ -8,17 +8,17 @@ import logger
 
 def configure_services():
     if 'services' not in settings:
-        settings['services'] = {}
+        config.s('services', {})
 
     for service, service_definition in env['services'].items():
-        if service in settings['services']:
-            if not settings['services'][service].get('active', True):
+        if service in config.g('services'):
+            if not config.g('services.' + service + '.active', True):
                 del env['services'][service]
 
 
 def configure_volumes():
     if 'volumes' not in settings:
-        settings['volumes'] = {}
+        config.s('volumes', {})
 
     for service, service_definition in env['services'].items():
         for i, volume in enumerate(service_definition['volumes']):
@@ -30,7 +30,7 @@ def configure_volumes():
             if opts is None:
                 opts = get_volume_opts(volume)
 
-            if volume in settings['volumes']:
+            if volume in config.g('volumes'):
                 env['services'][service]['volumes'][i] = ':'.join([
                     get_volume_source(volume),
                     get_volume_target(volume),
@@ -43,17 +43,17 @@ def configure_volumes():
 
 def configure_networking():
     env['networks'] = {
-        'default': None
+        'default': {}
     }
 
     if 'remotes' not in settings:
-        settings['remotes'] = {}
+        config.s('remotes', {})
 
     all_remotes_active = {}
     extra_hosts = []
     aliases = {}
 
-    for name, config in settings['remotes'].items():
+    for name, config in config.g('remotes').items():
         service = config.get('service', name)
         ip = config.get('ip', None)
         active = True
@@ -104,31 +104,31 @@ def configure_networking():
 
 
 def get_volume_target(name):
-    if 'volumes' not in settings or name not in settings['volumes']:
+    if 'volumes' not in settings or name not in config.g('volumes'):
         return None
 
-    if 'target' in settings['volumes'][name]:
-        return settings['volumes'][name]['target']
+    if 'target' in config.g('volumes.' + name):
+        return config.g('volumes.' + name + '.target')
 
     return os.path.join('/volumes', name)
 
 
 def get_volume_source(name):
-    if 'volumes' not in settings or name not in settings['volumes']:
+    if 'volumes' not in settings or name not in config.g('volumes'):
         return None
 
-    if 'source' in settings['volumes'][name]:
-        return settings['volumes'][name]['source']
+    if 'source' in config.g('volumes.' + name):
+        return config.g('volumes.' + name + '.source')
 
     return os.path.join(get_volumes_dir(), name)
 
 
 def get_volume_opts(name):
-    if 'volumes' not in settings or name not in settings['volumes']:
+    if 'volumes' not in settings or name not in config.g('volumes'):
         return None
 
-    if 'opts' in settings['volumes'][name]:
-        return settings['volumes'][name]['opts']
+    if 'opts' in config.g('volumes.' + name):
+        return config.g('volumes.' + name + '.opts')
 
     return 'rw'
 

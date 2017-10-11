@@ -1,6 +1,5 @@
 from dict_utils import deep_merge
 from yaml_util import explain
-from config import settings
 from sync import sync_is_enabled, sync
 import commands
 import environment
@@ -29,11 +28,11 @@ def run():
     environment.configure_networking()
 
     if settings.get('allay_list_volumes', False):
-        explain('Volume Configuration', settings['volumes'])
+        explain('Volume Configuration', config.g('volumes'))
         exit()
 
-    if settings.get('allay_list_configuration', False):
-        explain('Configuration', settings)
+    if config.g('allay_list_configuration', False):
+        explain('Configuration', config.g)
         exit()
 
     if sync_is_enabled():
