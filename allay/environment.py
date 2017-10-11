@@ -1,14 +1,14 @@
 import glob
 import os
 
-from config import settings, get_volumes_dir, get_project_root, get_config_root
+from config import get_volumes_dir, get_project_root, get_config_root
+import config
 import yaml_util
 import logger
 
 
 def configure_services():
-    if 'services' not in settings:
-        config.s('services', {})
+    config.s('services', {})
 
     for service, service_definition in env['services'].items():
         if service in config.g('services'):
@@ -17,8 +17,7 @@ def configure_services():
 
 
 def configure_volumes():
-    if 'volumes' not in settings:
-        config.s('volumes', {})
+    config.s('volumes', {})
 
     for service, service_definition in env['services'].items():
         for i, volume in enumerate(service_definition['volumes']):
@@ -46,22 +45,21 @@ def configure_networking():
         'default': {}
     }
 
-    if 'remotes' not in settings:
-        config.s('remotes', {})
+    config.s('remotes', {})
 
     all_remotes_active = {}
     extra_hosts = []
     aliases = {}
 
-    for name, config in config.g('remotes').items():
-        service = config.get('service', name)
-        ip = config.get('ip', None)
+    for name, c in config.g('remotes').items():
+        service = c.get('service.' + name)
+        ip = c.get('ip', None)
         active = True
 
         if service not in all_remotes_active:
             all_remotes_active[service] = True
 
-        if service in env['services'] and not config.get('active', False):
+        if service in env['services'] and not c.get('active', False):
             active = False
 
         all_remotes_active[service] = all_remotes_active[service] and active
@@ -104,33 +102,30 @@ def configure_networking():
 
 
 def get_volume_target(name):
-    if 'volumes' not in settings or name not in config.g('volumes'):
+    if not config.g('volumes.' + name, False):
         return None
 
-    if 'target' in config.g('volumes.' + name):
-        return config.g('volumes.' + name + '.target')
-
-    return os.path.join('/volumes', name)
+    return config.g(
+        'volumes.' + name + '.target',
+        os.path.join('/volumes', name)
+    )
 
 
 def get_volume_source(name):
-    if 'volumes' not in settings or name not in config.g('volumes'):
+    if not config.g('volumes.' + name, False):
         return None
 
-    if 'source' in config.g('volumes.' + name):
-        return config.g('volumes.' + name + '.source')
-
-    return os.path.join(get_volumes_dir(), name)
+    return config.g(
+        'volumes.' + name + '.source',
+        os.path.join(get_volumes_dir(), name)
+    )
 
 
 def get_volume_opts(name):
-    if 'volumes' not in settings or name not in config.g('volumes'):
+    if not config.g('volumes.' + name, False):
         return None
 
-    if 'opts' in config.g('volumes.' + name):
-        return config.g('volumes.' + name + '.opts')
-
-    return 'rw'
+    return config.g('volumes.' + name + '.opts', 'rw')
 
 
 def load_files():
@@ -150,5 +145,6 @@ def write_docker_compose():
 
     docker_compose_path = os.path.join(get_project_root(), 'docker-compose.yml')
     yaml_util.write(env, docker_compose_path)
+
 
 env = {}

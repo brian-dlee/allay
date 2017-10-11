@@ -155,7 +155,7 @@ def validate():
 command_parser = argparse.ArgumentParser()
 registry = {}
 
-register('-Fd', '--allay-feature-dbsync', dest='allay_feature_dbsync',
+register('-Fd', '--allay-feature-dbsync', dest='allay_feature_dbsync', default='on',
          help='Enables/disables database synchronization. yes or no')
 register('-Ri', '--allay-remote-ip', nargs='*', dest='allay_remote_ip',
          help='Configure a remote alternative for a service. Format = remote:(ip or hostname)')

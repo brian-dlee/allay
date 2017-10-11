@@ -1,6 +1,7 @@
 from dict_utils import deep_merge
 from yaml_util import explain
 from sync import sync_is_enabled, sync
+from config import settings
 import commands
 import environment
 import extension_manager
@@ -32,7 +33,7 @@ def run():
         exit()
 
     if config.g('allay_list_configuration', False):
-        explain('Configuration', config.g)
+        explain('Configuration', config.g())
         exit()
 
     if sync_is_enabled():

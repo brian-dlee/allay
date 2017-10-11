@@ -3,9 +3,9 @@ import os
 import re
 import shutil
 
-from allay.config import settings
 from allay.environment import get_volume_source
-from allay import logger
+import logger
+import config
 import magnet
 
 sftp_downloader = None
@@ -102,12 +102,11 @@ def initialize_sftp_downloader():
 
 def has_all_settings_defined():
     return (
-        'dbsync' in settings and
-        'host' in config.g('dbsync') and
-        'user' in config.g('dbsync') and
-        'schemas' in config.g('dbsync') and
-        'schema-volume' in config.g('dbsync') and
-        'database-volume' in config.g('dbsync')
+        config.g('dbsync.host') and
+        config.g('dbsync.user') and
+        config.g('dbsync.schemas') and
+        config.g('dbsync.schema-volume') and
+        config.g('dbsync.database-volume')
     )
 
 

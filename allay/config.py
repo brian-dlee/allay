@@ -1,19 +1,8 @@
 import os
 
+from allay.dict_utils import deep_merge
 import allay.paths
 import allay.yaml_util
-
-
-def merge(source, destination):
-    for key, value in source.items():
-        if isinstance(value, dict):
-            # get node or create one
-            node = destination.setdefault(key, {})
-            merge(value, node)
-        else:
-            destination[key] = value
-
-    return destination
 
 
 def divide_and_conquer(s, k, v):
@@ -24,14 +13,17 @@ def divide_and_conquer(s, k, v):
         if k not in s:
             s[k] = {}
 
-        s = merge({k: divide_and_conquer(s[k], '.'.join(ks[1:]), v)}, s)
+        s = deep_merge(s, {k: divide_and_conquer(s[k], '.'.join(ks[1:]), v)})
     else:
-        s = merge({k: v}, s)
+        s = deep_merge(s, {k: v})
 
     return s
 
 
-def flat_settings():
+def flat_settings(s=None):
+    if not s:
+        s = settings
+
     def flatten(k, v):
         if not isinstance(v, (dict, list, tuple)):
             return {
@@ -46,17 +38,33 @@ def flat_settings():
 
         return result
 
-    return flatten(None, settings)
+    return flatten(None, s)
 
 
 def g(name=None, default=None):
-    if name is None:
-        for k, v in flat_settings().iteritems():
-            result = merge(divide_and_conquer(result, k, v), result)
+    def format_value(v):
+        return v.format(**flat_settings()) if isinstance(v, str) else v
 
-        return result
+    focus = settings
 
-    return settings.get(name, default).format(**flat_settings())
+    if name is not None:
+        for p in name.split('.'):
+            focus = focus.get(p, None)
+
+            if focus is None:
+                return default
+
+    result = {}
+
+    if not isinstance(focus, dict):
+        return format_value(focus)
+
+    for k, v in flat_settings(focus).iteritems():
+        value = format_value(v)
+
+        result = deep_merge(result, divide_and_conquer(result, k, value))
+
+    return result
 
 
 def s(name, value):
@@ -65,7 +73,7 @@ def s(name, value):
     if name:
         settings = divide_and_conquer(settings, name, value)
     else:
-        settings = merge(value, settings)
+        settings = deep_merge(settings, value)
 
 
 def get_project_root():
