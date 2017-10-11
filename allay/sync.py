@@ -206,6 +206,11 @@ def update_schema_files(schema_dir, schema_file_to_update):
 
     logger.log("Downloading missing/outdated schemas from remote system.")
 
+    remote_schema_dir = settings['database_synchronize_settings'].get(
+        'remote_schema_dir',
+        'database-schemas'
+    )
+
     schemas_updated = 0
 
     for number, schema_file_path in enumerate(schema_file_to_update):
@@ -233,7 +238,7 @@ def update_schema_files(schema_dir, schema_file_to_update):
 
         try:
             sftp_downloader.get_file(
-                'database-schemas/{0}.sql.gz'.format(schema_name),
+                '{0}/{1}.sql.gz'.format(remote_schema_dir, schema_name),
                 schema_file_path
             )
         except Exception as e:

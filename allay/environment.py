@@ -42,7 +42,9 @@ def configure_volumes():
 
 
 def configure_networking():
-    env['networks'] = ['default']
+    env['networks'] = {
+        'default': None
+    }
 
     if 'remotes' not in settings:
         settings['remotes'] = {}
