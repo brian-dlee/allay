@@ -1,7 +1,7 @@
 from dict_utils import deep_merge
 from yaml_util import explain
-from environment import env
 from config import settings
+from sync import sync_is_enabled, sync
 import commands
 import environment
 import extension_manager
@@ -35,6 +35,15 @@ def run():
     if settings.get('allay_list_configuration', False):
         explain('Configuration', settings)
         exit()
+
+    if sync_is_enabled():
+        sync()
+    else:
+        logger.warn("Database synchronization is not configured. Skipping.")
+        logger.log(
+            "For information on enabling database synchronization, "
+            "see https://github.com/brian-dlee/allay#configure-database-synchronization"
+        )
 
     commands.validate()
     commands.run()

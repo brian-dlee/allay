@@ -12,7 +12,8 @@ setup(
     install_requires=[
         'PyYaml',
         'termcolor',
-        'pip'
+        'pip',
+        'magnet'
     ],
     scripts=['scripts/allay'],
     zip_safe=True,
