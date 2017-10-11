@@ -164,14 +164,19 @@ def sync():
     data_dir = volume_settings['database']['source_path']
     schema_dir = volume_settings['schema']['source_path']
 
-    max_age = int(settings.get('schema_file_max_age', 1)) * 24 * 60 * 60
+    max_age_in_days = int(settings['database_synchronize_settings'].get(
+        'schema_file_max_age',
+        1
+    ))
+
+    max_age_in_seconds = max_age_in_days * 24 * 60 * 60
 
     logger.log("Checking local schema files.")
 
     schema_files_to_update = check_local_schema_files(
         schema_dir,
         schemas,
-        max_age
+        max_age_in_seconds
     )
 
     if len(schema_files_to_update) > 0:
