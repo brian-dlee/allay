@@ -79,6 +79,9 @@ def get_cli_settings():
 
                 if isinstance(individual_value, str):
                     setting_value = individual_value.split(':')
+                    option_value = normalize_config_value(
+                        ':'.join(setting_value[1:])
+                    )
 
                     if len(setting_value) < 2:
                         logger.error("Malformed allay option for type "
@@ -89,8 +92,9 @@ def get_cli_settings():
                         cli_settings[setting_key][setting_value[0]] = {}
 
                     cli_settings[setting_key][setting_value[0]][setting_type] = \
-                        normalize_config_value(setting_value[1])
-        if key_parts[0] == 'allay' and key_parts[1] in ('feature') and v:
+                        option_value
+                    
+        elif key_parts[0] == 'allay' and key_parts[1] in ('feature', 'network') and v:
             if key_parts[1] not in cli_settings:
                 cli_settings[key_parts[1]] = {}
 
@@ -165,6 +169,8 @@ register('-Rs', '--allay-remote-service', nargs='*', dest='allay_remote_service'
          help='Indicates which service this remote replaces. Format = remote:service')
 register('-Sa', '--allay-service-active', nargs='*', dest='allay_service_active',
          help='Turn on or off a given service. Format = service:(yes or no)')
+register('-Sp', '--allay-service-port', dest='allay_service_port', nargs='*', dest='allay_service_port',
+         help='Add a host port mapping to a service. Format = service:host_port:container_port')
 register('-Pr', '--allay-paths-project-root', dest='allay_paths_project_root',
          help='Configure the path in which to search for the Allay-enabled project.')
 register('-Pc', '--allay-paths-config-root', dest='allay_paths_config_root',

@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='allay',
-    version='0.3.0',
+    version='0.3.1',
     description='Alleviate environmental pains',
     url='https://github.com/brian-dlee/Allay.git',
     author='Brian Lee',

@@ -15,6 +15,26 @@ def configure_services():
             if not config.g('services.' + service + '.active', True):
                 del env['services'][service]
 
+            if config.g('services.' + service + '.port'):
+                (src_port, dest_port) = \
+                    config.g('services.' + service + '.port').split(':')
+                new_setting = src_port + ':' + dest_port if dest_port else src_port
+
+                if 'ports' in env['services'][service]:
+                    for (i, port_setting) in enumerate(env['services'][service]):
+                        if port_setting == dest_port or port_setting.find(':' + dest_port) > -1:
+                            env['services'][service]['ports'][i] = new_setting
+                else:
+                    env['services'][service]['ports'] = [new_setting]
+
+        if 'ports' in env['services'][service]:
+            for (i, port_setting) in enumerate(env['services'][service]):
+                if port_setting.find(':') == '-1':
+                    logger.warn(
+                        'Port {0} for the service {1} is '.format(port_setting, service) +
+                        'has not been mapped to a host port.'
+                    )
+
 
 def configure_volumes():
     config.s('volumes', {})
@@ -38,7 +58,6 @@ def configure_volumes():
             else:
                 logger.error("The volume " + volume + " is defined in the service " + service +
                              ", but no volume named " + volume + " has been configured.")
-
 
 def configure_networking():
     env['networks'] = {
