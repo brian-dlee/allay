@@ -21,15 +21,15 @@ def configure_services():
                 new_setting = src_port + ':' + dest_port if dest_port else src_port
 
                 if 'ports' in env['services'][service]:
-                    for (i, port_setting) in enumerate(env['services'][service]):
-                        if port_setting == dest_port or port_setting.find(':' + dest_port) > -1:
+                    for (i, port_setting) in enumerate(env['services'][service]['ports']):
+                        if str(port_setting) == dest_port or str(port_setting).find(':' + dest_port) > -1:
                             env['services'][service]['ports'][i] = new_setting
                 else:
                     env['services'][service]['ports'] = [new_setting]
 
         if 'ports' in env['services'][service]:
-            for (i, port_setting) in enumerate(env['services'][service]):
-                if port_setting.find(':') == '-1':
+            for (i, port_setting) in enumerate(env['services'][service]['ports']):
+                if str(port_setting).find(':') == -1:
                     logger.warn(
                         'Port {0} for the service {1} is '.format(port_setting, service) +
                         'has not been mapped to a host port.'
