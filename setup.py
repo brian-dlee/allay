@@ -15,6 +15,9 @@ setup(
         'pip',
         'magnet'
     ],
+    dependency_links=[
+        "git+ssh://git@github.com/brian-dlee/magnet.git#egg=magnet"
+    ],    
     scripts=['scripts/allay'],
     zip_safe=True,
     test_suite='allay.test',
