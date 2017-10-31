@@ -13,10 +13,10 @@ setup(
         'PyYaml',
         'termcolor',
         'pip',
-        'magnet==0.1.1'
+        'magnet'
     ],
     dependency_links=[
-        "git+ssh://git@github.com/brian-dlee/magnet.git@master#egg=magnet-0.1.1"
+        "git+https://github.com/brian-dlee/magnet.git#egg=magnet"
     ],    
     scripts=['scripts/allay'],
     zip_safe=True,
