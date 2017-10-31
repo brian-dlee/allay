@@ -16,7 +16,7 @@ setup(
         'magnet'
     ],
     dependency_links=[
-        "https://github.com/brian-dlee/tarball/master#egg=magnet"
+        "https://github.com/brian-dlee/magnet/archive/master.zip#egg=magnet"
     ],    
     scripts=['scripts/allay'],
     zip_safe=True,
