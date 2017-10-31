@@ -13,7 +13,7 @@ setup(
         'PyYaml',
         'termcolor',
         'pip',
-        'magnet'
+        'git+https://github.com/brian-dlee/magnet.git#egg=magnet'
     ],
     dependency_links=[
         "git+https://github.com/brian-dlee/magnet.git#egg=magnet"
