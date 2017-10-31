@@ -13,11 +13,11 @@ setup(
         'PyYaml',
         'termcolor',
         'pip',
-        'magnet==0.1.1'
+        'magnet'
     ],
     dependency_links=[
-        "http://github.com/brian-dlee/magnet/tarball/master#egg=magnet-0.1.1"
-    ],    
+        "http://github.com/brian-dlee/magnet/tarball/master#egg=magnet"
+    ],
     scripts=['scripts/allay'],
     zip_safe=True,
     test_suite='allay.test',
